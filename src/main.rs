@@ -1,4 +1,7 @@
 use actix_cors::Cors;
+use actix_web::middleware::Logger;
+use env_logger::Env;
+
 use actix_web::{
     cookie::{self, Cookie},
     post, web, App, HttpResponse, HttpServer,
@@ -49,8 +52,11 @@ async fn login(auth_data: web::Json<AuthData>) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
     HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             .wrap(
                 Cors::default() // Use Cors middleware
                     .allowed_origin("http://localhost:8080") // Set allowed origin
